@@ -32,7 +32,9 @@ function App() {
           stream = s;
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
-            videoRef.current.play();
+            videoRef.current.play().catch(err => {
+              console.error('無法播放相機影片：', err);
+            });
             setCameraError('');
           }
         })
@@ -87,12 +89,21 @@ function App() {
   };
 
   const takePhoto = () => {
-    if (!canvasRef.current || !videoRef.current) return;
+    console.log('📸 拍照按下了');
+    if (!canvasRef.current || !videoRef.current) {
+      console.error('📷 video 或 canvas 未準備好');
+      return;
+    }
+
     const context = canvasRef.current.getContext('2d');
-    if (!context) return;
+    if (!context) {
+      console.error('⚠️ 無法取得 canvas context');
+      return;
+    }
 
     context.drawImage(videoRef.current, 0, 0, 320, 240);
     const imageData = canvasRef.current.toDataURL('image/png');
+    console.log('📸 已拍下 base64 圖片');
     setPhotoPreview(imageData);
   };
 
@@ -168,6 +179,7 @@ function App() {
             {!photoPreview && (
               <>
                 <video ref={videoRef} width="320" height="240" className="border" autoPlay muted playsInline />
+                <canvas ref={canvasRef} width="320" height="240" hidden />
                 <button className="bg-purple-500 text-white rounded px-4 py-1" onClick={takePhoto} disabled={loading}>
                   拍照
                 </button>

@@ -72,18 +72,22 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
     const userMessage = { sender: 'user', text: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
+  
+    // 這一行是新加的提示語
+    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
+  
     setLoading(true);
-
+  
     try {
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input }),
       });
-
+  
       const data = await response.json();
       let replyText = '無回應';
-
+  
       if (typeof data === 'object' && 'reply' in data) {
         replyText = data.reply;
       } else if (typeof data === 'string') {
@@ -91,9 +95,9 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
       } else if (typeof data === 'object') {
         replyText = flattenObject(data).join('\n');
       }
-
-      const botMessage = { sender: 'bot', text: replyText };
-      setMessages((prev) => [...prev, botMessage]);
+  
+      // 把原本的暫時訊息更新成最終回應（或直接 append）
+      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
     } catch (error) {
       setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
     } finally {

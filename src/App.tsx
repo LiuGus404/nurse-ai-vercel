@@ -1,96 +1,52 @@
-import { useState, useRef, useEffect } from 'react';
+// ... 省略前面內容（保持不變） ...
 
-function flattenObject(obj: any, prefix = ''): string[] {
-  const lines: string[] = [];
-  for (const key in obj) {
-    const value = obj[key];
-    const path = prefix ? `${prefix}.${key}` : key;
-    if (typeof value === 'object' && value !== null) {
-      lines.push(...flattenObject(value, path));
-    } else {
-      lines.push(`${path}: ${value}`);
-    }
-  }
-  return lines;
+<div className="space-y-2">
+{!showCamera && (
+  <button className="border border-black text-black bg-white rounded px-4 py-1 text-sm hover:bg-gray-100" onClick={() => setShowCamera(true)}>
+    啟動相機
+  </button>
+)}
+{cameraError && <p className="text-red-500 text-sm">{cameraError}</p>}
+{showCamera && !cameraError && (
+  <div className="space-y-2">
+    {!photoPreview && (
+      <>
+        <video ref={videoRef} width="320" height="240" className="border" autoPlay muted playsInline />
+        <canvas ref={canvasRef} width="320" height="240" hidden />
+        <button className="border border-black bg-white text-black rounded px-4 py-1 text-sm hover:bg-gray-100" onClick={takePhoto} disabled={loading}>
+          拍照
+        </button>
+      </>
+    )}
+    {photoPreview && (
+      <div className="space-y-2">
+        <img src={photoPreview} alt="preview" className="border rounded" width={320} height={240} />
+        <div className="flex gap-2">
+          <button className="border border-black text-black bg-white px-4 py-1 rounded text-sm hover:bg-gray-100" onClick={confirmPhoto} disabled={loading}>
+            確認送出
+          </button>
+          <button className="border border-gray-500 text-gray-700 bg-white px-4 py-1 rounded text-sm hover:bg-gray-100" onClick={cancelPhoto} disabled={loading}>
+            重拍
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
+</div>
+
+<div className="pt-4 text-center">
+<a
+  href="https://forms.gle/WGa6u65LAT3PLmVm9"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100"
+>
+  按此進行小測驗
+</a>
+</div>
+</div>
+);
 }
 
-function App() {
-  const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string; image?: string }[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showCamera, setShowCamera] = useState(false);
-  const [cameraError, setCameraError] = useState('');
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [showHelp, setShowHelp] = useState<'wear' | 'care' | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    let stream: MediaStream;
-    if (showCamera && navigator.mediaDevices?.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(s => {
-          stream = s;
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            videoRef.current.play().catch(err => {
-              console.error('無法播放相機影片：', err);
-            });
-            setCameraError('');
-          }
-        })
-        .catch(err => {
-          console.error('相機啟動失敗:', err);
-          setCameraError('無法啟動相機，請確認已允許瀏覽器存取相機。');
-        });
-    }
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [showCamera]);
-
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-    const userMessage = { sender: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-
-    const thinkingMessage = { sender: 'bot', text: '正在思考中...', image: undefined };
-    setMessages((prev) => [...prev, thinkingMessage]);
-
-    const startTime = performance.now();
-    setLoading(true);
-
-    try {
-      const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
-      });
-
-      const data = await response.json();
-      let replyText = '無回應';
-
-      if (typeof data === 'object' && 'reply' in data) {
-        replyText = data.reply;
-      } else if (typeof data === 'string') {
-        replyText = data;
-      } else if (typeof data === 'object') {
-        replyText = flattenObject(data).join('\n');
-      }
-
-      const endTime = performance.now();
-      const duration = ((endTime - startTime) / 1000).toFixed(2);
-
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { sender: 'bot', text: `${replyText}\n\n🕒 回應時間：${duration} 秒` },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [...prev.slice(0, -1), { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
-    } finally {
-      setLoading(false);
-    }
-  };
+export default App;

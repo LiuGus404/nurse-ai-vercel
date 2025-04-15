@@ -254,6 +254,14 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
               <>
                 <video ref={videoRef} width="320" height="240" className="border" autoPlay muted playsInline />
                 <canvas ref={canvasRef} width="320" height="240" hidden />
+                <div className="flex gap-2">
+          <button onClick={toggleCamera} className="border border-gray-400 px-3 py-1 rounded text-sm hover:bg-gray-100">
+            切換鏡頭
+          </button>
+          <button onClick={closeCamera} className="border border-gray-400 px-3 py-1 rounded text-sm hover:bg-gray-100">
+            關閉鏡頭
+          </button>
+        </div>
                 <button className="border border-black bg-white text-black rounded px-4 py-1 text-sm hover:bg-gray-100" onClick={takePhoto} disabled={loading}>
                   拍照
                 </button>

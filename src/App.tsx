@@ -18,7 +18,7 @@ function flattenObject(obj: any, prefix = ''): string[] {
 function App() {
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string; image?: string }[]>([{
     sender: 'bot',
-    text: '你好！我是你的AI骨科護士，有甚麼有關 AFO（足踝矯形器）或 Hinge Knee Brace（活動式膝關節支架） 的問題都可以向我查詢！',
+    text: '你好！有甚麼有關 AFO（足踝矯形器）或 Hinge Knee Brace（活動式膝關節支架） 的問題都可以向我查詢！',
   }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -193,7 +193,9 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   };
 
   return (
-    <div className="border border-gray-300 bg-white text-sm text-gray-700 px-4 py-2 rounded mb-4 shadow-sm">
+    <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800">
+      <h1 className="text-2xl font-bold mb-4">AI智能護士</h1>
+      <div className="bg-white border border-gray-300 text-sm text-gray-700 px-4 py-3 rounded-lg shadow-sm mb-4">
   <p>
     📱 想更方便使用嗎？你可以將本網站加到主畫面，就像 App 一樣使用！
   </p>

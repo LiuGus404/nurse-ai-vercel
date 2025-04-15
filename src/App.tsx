@@ -195,7 +195,17 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800">
       <h1 className="text-2xl font-bold mb-4">AI智能護士</h1>
-
+      <div className="bg-yellow-50 border border-yellow-200 text-sm text-gray-800 px-4 py-2 rounded mb-4">
+  <p>
+    📱 想更方便使用嗎？你可以將本網站加到主畫面，就像 App 一樣使用！
+  </p>
+  <p className="mt-1">
+    <strong>iPhone（Safari）：</strong> 點擊下方「分享」圖示 → 選擇「加入主畫面」
+  </p>
+  <p className="mt-1">
+    <strong>Android（Chrome）：</strong> 點右上「⋮」 → 選擇「加到主畫面」
+  </p>
+</div>
       <div className="flex justify-end gap-2">
         <button onClick={() => setShowHelp('wear')} className="text-sm text-gray-700 hover:underline">如何戴？</button>
         <button onClick={() => setShowHelp('care')} className="text-sm text-gray-700 hover:underline">如何護理？</button>

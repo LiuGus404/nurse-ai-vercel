@@ -25,13 +25,14 @@ function App() {
   const [cameraError, setCameraError] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState<'wear' | 'care' | null>(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     let stream: MediaStream;
     if (showCamera && navigator.mediaDevices?.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode } })
         .then(s => {
           stream = s;
           if (videoRef.current) {
@@ -52,137 +53,34 @@ function App() {
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [showCamera]);
+  }, [showCamera, facingMode]);
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-    const userMessage = { sender: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setLoading(true);
-
-    try {
-      const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
-      });
-
-      const data = await response.json();
-      let replyText = '無回應';
-
-      if (typeof data === 'object' && 'reply' in data) {
-        replyText = data.reply;
-      } else if (typeof data === 'string') {
-        replyText = data;
-      } else if (typeof data === 'object') {
-        replyText = flattenObject(data).join('\n');
-      }
-
-      const botMessage = { sender: 'bot', text: replyText };
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
-      setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
-    } finally {
-      setLoading(false);
-    }
+  const toggleCamera = () => {
+    setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
+    setShowCamera(false);
+    setTimeout(() => setShowCamera(true), 100);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') sendMessage();
-  };
-
-  const takePhoto = () => {
-    if (!canvasRef.current || !videoRef.current) return;
-    const context = canvasRef.current.getContext('2d');
-    if (!context) return;
-
-    context.drawImage(videoRef.current, 0, 0, 320, 240);
-    const imageData = canvasRef.current.toDataURL('image/png');
-    setPhotoPreview(imageData);
-  };
-
-  const confirmPhoto = async () => {
-    if (!photoPreview) return;
-    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: photoPreview }]);
-    setLoading(true);
-
-    const payload = new FormData();
-    payload.append('image', photoPreview);
-
-    try {
-      const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
-        method: 'POST',
-        body: payload
-      });
-      const data = await response.json();
-
-      let replyText = '無回應';
-      if (typeof data === 'object' && 'reply' in data) {
-        replyText = data.reply;
-      } else if (typeof data === 'string') {
-        replyText = data;
-      } else if (typeof data === 'object') {
-        replyText = flattenObject(data).join('\n');
-      }
-
-      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
-      setShowCamera(false);
-      setPhotoPreview(null);
-    } catch {
-      setMessages((prev) => [...prev, { sender: 'bot', text: '拍照送出時發生錯誤' }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const cancelPhoto = () => {
+  const closeCamera = () => {
+    setShowCamera(false);
     setPhotoPreview(null);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result as string;
-      setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: base64 }]);
-      setLoading(true);
-
-      const payload = new FormData();
-      payload.append('image', base64);
-
-      try {
-        const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
-          method: 'POST',
-          body: payload
-        });
-        const data = await response.json();
-
-        let replyText = '無回應';
-        if (typeof data === 'object' && 'reply' in data) {
-          replyText = data.reply;
-        } else if (typeof data === 'string') {
-          replyText = data;
-        } else if (typeof data === 'object') {
-          replyText = flattenObject(data).join('\n');
-        }
-
-        setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
-      } catch {
-        setMessages((prev) => [...prev, { sender: 'bot', text: '圖片上傳時發生錯誤' }]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
+  // 其餘程式碼保持不變直到相機 UI 區域內插入以下：
+  // 在 {!photoPreview && ( <>) 區塊中插入以下按鈕：
+  // 於 video 與 canvas 之後插入
+  // 即：<video ... />
+  //      <canvas ... />
+  //   → 插入這段：
+  //      <div className="flex gap-2">
+  //        <button ... 切換鏡頭>
+  //        <button ... 關閉鏡頭>
+  //      </div>
+  // 然後繼續接著「拍照」按鈕即可
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800">
       <h1 className="text-2xl font-bold mb-4">AI智能護士</h1>
-
       <div className="flex justify-end gap-2">
         <button onClick={() => setShowHelp('wear')} className="text-sm text-gray-700 hover:underline">如何戴？</button>
         <button onClick={() => setShowHelp('care')} className="text-sm text-gray-700 hover:underline">如何護理？</button>
@@ -241,6 +139,14 @@ function App() {
               <>
                 <video ref={videoRef} width="320" height="240" className="border" autoPlay muted playsInline />
                 <canvas ref={canvasRef} width="320" height="240" hidden />
+                <div className="flex gap-2">
+                  <button className="border border-gray-500 text-gray-700 bg-white px-3 py-1 rounded text-sm hover:bg-gray-100" onClick={toggleCamera}>
+                    切換鏡頭
+                  </button>
+                  <button className="border border-gray-300 text-gray-600 bg-white px-3 py-1 rounded text-sm hover:bg-gray-100" onClick={closeCamera}>
+                    關閉鏡頭
+                  </button>
+                </div>
                 <button className="border border-black bg-white text-black rounded px-4 py-1 text-sm hover:bg-gray-100" onClick={takePhoto} disabled={loading}>
                   拍照
                 </button>

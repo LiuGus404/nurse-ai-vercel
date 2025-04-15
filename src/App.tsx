@@ -20,6 +20,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [cameraError, setCameraError] = useState('');
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -85,16 +86,6 @@ function App() {
     if (e.key === 'Enter') sendMessage();
   };
 
-  const dataURLtoFile = (dataUrl: string, filename: string): File => {
-    const arr = dataUrl.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) u8arr[n] = bstr.charCodeAt(n);
-    return new File([u8arr], filename, { type: mime });
-  };
-
   const takePhoto = () => {
     if (!canvasRef.current || !videoRef.current) return;
     const context = canvasRef.current.getContext('2d');
@@ -102,37 +93,45 @@ function App() {
 
     context.drawImage(videoRef.current, 0, 0, 320, 240);
     const imageData = canvasRef.current.toDataURL('image/png');
-    const imageFile = dataURLtoFile(imageData, 'photo.png');
+    setPhotoPreview(imageData);
+  };
 
+  const confirmPhoto = async () => {
+    if (!photoPreview) return;
     setMessages((prev) => [...prev, { sender: 'user', text: '[已拍照]' }]);
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('image', imageFile); // ✅ 正確欄位名稱
-    formData.append('text', input);      // ✅ 使用者訊息
+    const payload = new FormData();
+    payload.append('image', photoPreview);
 
-    fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
-      method: 'POST',
-      body: formData
-    })
-      .then(res => res.json())
-      .then(data => {
-        let replyText = '無回應';
-        if (typeof data === 'object' && 'reply' in data) {
-          replyText = data.reply;
-        } else if (typeof data === 'string') {
-          replyText = data;
-        } else if (typeof data === 'object') {
-          replyText = flattenObject(data).join('\n');
-        }
-        setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
-      })
-      .catch(() => {
-        setMessages((prev) => [...prev, { sender: 'bot', text: '拍照送出時發生錯誤' }]);
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
+        method: 'POST',
+        body: payload
       });
+      const data = await response.json();
+
+      let replyText = '無回應';
+      if (typeof data === 'object' && 'reply' in data) {
+        replyText = data.reply;
+      } else if (typeof data === 'string') {
+        replyText = data;
+      } else if (typeof data === 'object') {
+        replyText = flattenObject(data).join('\n');
+      }
+
+      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
+      setShowCamera(false);
+      setPhotoPreview(null);
+    } catch {
+      setMessages((prev) => [...prev, { sender: 'bot', text: '拍照送出時發生錯誤' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelPhoto = () => {
+    setPhotoPreview(null);
   };
 
   return (
@@ -166,11 +165,27 @@ function App() {
         {cameraError && <p className="text-red-500 text-sm">{cameraError}</p>}
         {showCamera && !cameraError && (
           <div className="space-y-2">
-            <video ref={videoRef} width="320" height="240" className="border" autoPlay muted playsInline />
-            <canvas ref={canvasRef} width="320" height="240" hidden />
-            <button className="bg-purple-500 text-white rounded px-4 py-1" onClick={takePhoto} disabled={loading}>
-              拍照並送出
-            </button>
+            {!photoPreview && (
+              <>
+                <video ref={videoRef} width="320" height="240" className="border" autoPlay muted playsInline />
+                <button className="bg-purple-500 text-white rounded px-4 py-1" onClick={takePhoto} disabled={loading}>
+                  拍照
+                </button>
+              </>
+            )}
+            {photoPreview && (
+              <div className="space-y-2">
+                <img src={photoPreview} alt="preview" className="border rounded" width={320} height={240} />
+                <div className="flex gap-2">
+                  <button className="bg-blue-600 text-white rounded px-4 py-1" onClick={confirmPhoto} disabled={loading}>
+                    確認送出
+                  </button>
+                  <button className="bg-gray-400 text-black rounded px-4 py-1" onClick={cancelPhoto} disabled={loading}>
+                    重拍
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

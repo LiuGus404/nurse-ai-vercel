@@ -85,6 +85,16 @@ function App() {
     if (e.key === 'Enter') sendMessage();
   };
 
+  const dataURLtoFile = (dataUrl: string, filename: string): File => {
+    const arr = dataUrl.split(',');
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new File([u8arr], filename, { type: mime });
+  };
+
   const takePhoto = () => {
     if (!canvasRef.current || !videoRef.current) return;
     const context = canvasRef.current.getContext('2d');
@@ -92,16 +102,18 @@ function App() {
 
     context.drawImage(videoRef.current, 0, 0, 320, 240);
     const imageData = canvasRef.current.toDataURL('image/png');
+    const imageFile = dataURLtoFile(imageData, 'photo.png');
 
     setMessages((prev) => [...prev, { sender: 'user', text: '[已拍照]' }]);
     setLoading(true);
 
-    const payload = new FormData();
-    payload.append('image', imageData);
+    const formData = new FormData();
+    formData.append('image', imageFile); // ✅ 正確欄位名稱
+    formData.append('text', input);      // ✅ 使用者訊息
 
     fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
       method: 'POST',
-      body: payload
+      body: formData
     })
       .then(res => res.json())
       .then(data => {

@@ -193,9 +193,7 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800">
-      <h1 className="text-2xl font-bold mb-4">AI智能骨科護士</h1>
-      <div className=""border border-gray-300 bg-white text-sm text-gray-700 px-4 py-2 rounded mb-4 shadow-sm">
+    <div className="border border-gray-300 bg-white text-sm text-gray-700 px-4 py-2 rounded mb-4 shadow-sm">
   <p>
     📱 想更方便使用嗎？你可以將本網站加到主畫面，就像 App 一樣使用！
   </p>

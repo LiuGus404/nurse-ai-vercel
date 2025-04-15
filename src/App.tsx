@@ -15,7 +15,7 @@ function flattenObject(obj: any, prefix = ''): string[] {
 }
 
 function App() {
-  const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string; image?: string }[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -89,27 +89,18 @@ function App() {
   };
 
   const takePhoto = () => {
-    console.log('📸 拍照按下了');
-    if (!canvasRef.current || !videoRef.current) {
-      console.error('📷 video 或 canvas 未準備好');
-      return;
-    }
-
+    if (!canvasRef.current || !videoRef.current) return;
     const context = canvasRef.current.getContext('2d');
-    if (!context) {
-      console.error('⚠️ 無法取得 canvas context');
-      return;
-    }
+    if (!context) return;
 
     context.drawImage(videoRef.current, 0, 0, 320, 240);
     const imageData = canvasRef.current.toDataURL('image/png');
-    console.log('📸 已拍下 base64 圖片');
     setPhotoPreview(imageData);
   };
 
   const confirmPhoto = async () => {
     if (!photoPreview) return;
-    setMessages((prev) => [...prev, { sender: 'user', text: '[已拍照]' }]);
+    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: photoPreview }]);
     setLoading(true);
 
     const payload = new FormData();
@@ -145,17 +136,57 @@ function App() {
     setPhotoPreview(null);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: base64 }]);
+      setLoading(true);
+
+      const payload = new FormData();
+      payload.append('image', base64);
+
+      try {
+        const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
+          method: 'POST',
+          body: payload
+        });
+        const data = await response.json();
+
+        let replyText = '無回應';
+        if (typeof data === 'object' && 'reply' in data) {
+          replyText = data.reply;
+        } else if (typeof data === 'string') {
+          replyText = data;
+        } else if (typeof data === 'object') {
+          replyText = flattenObject(data).join('\n');
+        }
+
+        setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
+      } catch {
+        setMessages((prev) => [...prev, { sender: 'bot', text: '圖片上傳時發生錯誤' }]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold mb-4">AI智能護士</h1>
       <div className="space-y-2 max-h-[60vh] overflow-y-auto p-2 border rounded-xl bg-neutral-100">
         {messages.map((msg, index) => (
           <div key={index} className={`p-3 rounded-xl ${msg.sender === 'user' ? 'bg-white' : 'bg-gray-200'}`}>
+            {msg.image && <img src={msg.image} alt="上傳圖片" className="mb-2 rounded border" width={240} />}
             <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
           </div>
         ))}
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <input
           className="flex-1 border rounded px-2 py-1"
           value={input}
@@ -166,6 +197,10 @@ function App() {
         <button className="bg-blue-500 text-white rounded px-4" onClick={sendMessage} disabled={loading}>
           {loading ? '傳送中…' : '發送'}
         </button>
+        <label className="bg-gray-200 px-3 py-1 rounded cursor-pointer">
+          上傳相片
+          <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+        </label>
       </div>
       <div className="space-y-2">
         {!showCamera && (

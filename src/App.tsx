@@ -70,14 +70,12 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
-  
-    // 先加入 user 訊息與暫存 bot 回覆
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-      { sender: 'bot', text: '已收到你的查詢，正在生成答案...' },
-    ]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
+  
+    // 這一行是新加的提示語
+    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
+  
     setLoading(true);
   
     try {
@@ -98,17 +96,8 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
         replyText = flattenObject(data).join('\n');
       }
   
-      // 將「正在生成中」那則訊息更新為實際回覆
-      setMessages((prev) => {
-        const updated = [...prev];
-        const index = updated.findIndex((m) => m.text === '已收到你的查詢，正在生成答案...');
-        if (index !== -1) {
-          updated[index] = { sender: 'bot', text: replyText };
-        } else {
-          updated.push({ sender: 'bot', text: replyText });
-        }
-        return updated;
-      });
+      // 把原本的暫時訊息更新成最終回應（或直接 append）
+      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
     } catch (error) {
       setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
     } finally {

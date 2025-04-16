@@ -83,20 +83,18 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
       });
   
       const data = await response.json();
-      let replyText = '無回應';
-  
-      if (typeof data === 'object') {
-        if (typeof data.reply === 'string') {
-          replyText = data.reply;
-        } else if (typeof data.output === 'string') {
-          replyText = data.output;
-        } else {
-          // 若都不是純文字，就展平顯示
-          replyText = flattenObject(data).join('\n');
-        }
-      } else if (typeof data === 'string') {
-        replyText = data;
-      }
+console.log('🪵 webhook response:', data);
+
+let replyText = '無回應';
+if (typeof data === 'object') {
+  if (typeof data.output === 'string') {
+    replyText = data.output;
+  } else {
+    replyText = flattenObject(data).join('\n');
+  }
+} else if (typeof data === 'string') {
+  replyText = data;
+}
   
       // 將「正在生成中」那句替換為真正回應
       setMessages((prev) => {

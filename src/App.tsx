@@ -70,13 +70,12 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
-  
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-      { sender: 'bot', text: '已收到你的查詢，正在生成答案...' },
-    ]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
+  
+    // 這一行是新加的提示語
+    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
+  
     setLoading(true);
   
     try {
@@ -89,39 +88,66 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
       const data = await response.json();
       let replyText = '無回應';
   
-      if (typeof data === 'object') {
-        if (typeof data.reply === 'string') {
-          replyText = data.reply;
-        } else if (typeof data.output === 'string') {
-          replyText = data.output;
-        } else {
-          replyText = flattenObject(data).join('\n');
-        }
+      if (typeof data === 'object' && 'reply' in data) {
+        replyText = data.reply;
       } else if (typeof data === 'string') {
         replyText = data;
+      } else if (typeof data === 'object') {
+        replyText = flattenObject(data).join('\n');
       }
   
-      setMessages((prev) => {
-        const updated = [...prev];
-        const index = updated.findIndex((m) => m.text === '已收到你的查詢，正在生成答案...');
-        if (index !== -1) {
-          updated[index] = { sender: 'bot', text: replyText };
-        } else {
-          updated.push({ sender: 'bot', text: replyText });
-        }
-        return updated;
-      });
+      // 把原本的暫時訊息更新成最終回應（或直接 append）
+      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
     } catch (error) {
-      setMessages((prev) => {
-        const updated = [...prev];
-        const index = updated.findIndex((m) => m.text === '已收到你的查詢，正在生成答案...');
-        if (index !== -1) {
-          updated[index] = { sender: 'bot', text: '發生錯誤，請稍後再試。' };
-        } else {
-          updated.push({ sender: 'bot', text: '發生錯誤，請稍後再試。' });
-        }
-        return updated;
+      setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') sendMessage();
+  };
+
+  const takePhoto = () => {
+    if (!canvasRef.current || !videoRef.current) return;
+    const context = canvasRef.current.getContext('2d');
+    if (!context) return;
+
+    context.drawImage(videoRef.current, 0, 0, 320, 240);
+    const imageData = canvasRef.current.toDataURL('image/png');
+    setPhotoPreview(imageData);
+  };
+
+  const confirmPhoto = async () => {
+    if (!photoPreview) return;
+    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: photoPreview }]);
+    setLoading(true);
+
+    const payload = new FormData();
+    payload.append('image', photoPreview);
+
+    try {
+      const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
+        method: 'POST',
+        body: payload
       });
+      const data = await response.json();
+
+      let replyText = '無回應';
+      if (typeof data === 'object' && 'reply' in data) {
+        replyText = data.reply;
+      } else if (typeof data === 'string') {
+        replyText = data;
+      } else if (typeof data === 'object') {
+        replyText = flattenObject(data).join('\n');
+      }
+
+      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
+      setShowCamera(false);
+      setPhotoPreview(null);
+    } catch {
+      setMessages((prev) => [...prev, { sender: 'bot', text: '拍照送出時發生錯誤' }]);
     } finally {
       setLoading(false);
     }

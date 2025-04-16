@@ -130,14 +130,18 @@ const replyText = typeof data === 'string'
       });
       const data = await response.json();
 
-      let replyText = '無回應';
-      if (typeof data === 'object' && 'reply' in data) {
-        replyText = data.reply;
-      } else if (typeof data === 'string') {
-        replyText = data;
-      } else if (typeof data === 'object') {
-        replyText = flattenObject(data).join('\n');
-      }
+let replyText = '無回應';
+if (typeof data === 'object') {
+  if (typeof data.reply === 'string') {
+    replyText = data.reply;
+  } else if (typeof data.output === 'string') {
+    replyText = data.output;
+  } else {
+    replyText = flattenObject(data).join('\n');
+  }
+} else if (typeof data === 'string') {
+  replyText = data;
+}
 
       setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
       setShowCamera(false);

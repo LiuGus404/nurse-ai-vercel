@@ -70,18 +70,15 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
-    const sendMessage = async () => {
-      if (!input.trim()) return;
-    
-      const userMessage = { sender: 'user', text: input };
-      setMessages((prev) => [
-        ...prev,
-        userMessage,
-        { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }
-      ]);
-      setInput('');
-      setLoading(true); // 加回這行
   
+    // 先加入 user 訊息與暫存 bot 回覆
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      { sender: 'bot', text: '已收到你的查詢，正在生成答案...' },
+    ]);
+    setInput('');
+    setLoading(true);
   
     try {
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
@@ -91,22 +88,27 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
       });
   
       const data = await response.json();
-const replyText = typeof data === 'string'
-  ? data
-  : typeof data.output === 'string'
-  ? data.output
-  : flattenObject(data).join('\n');
+      let replyText = '無回應';
   
-  setMessages((prev) => {
-    const updated = [...prev];
-    const index = updated.findIndex(m => m.text === '已收到你的查詢，正在生成答案...');
-    if (index !== -1) {
-      updated[index] = { sender: 'bot', text: replyText };
-    } else {
-      updated.push({ sender: 'bot', text: replyText });
-    }
-    return updated;
-  });
+      if (typeof data === 'object' && 'reply' in data) {
+        replyText = data.reply;
+      } else if (typeof data === 'string') {
+        replyText = data;
+      } else if (typeof data === 'object') {
+        replyText = flattenObject(data).join('\n');
+      }
+  
+      // 將「正在生成中」那則訊息更新為實際回覆
+      setMessages((prev) => {
+        const updated = [...prev];
+        const index = updated.findIndex((m) => m.text === '已收到你的查詢，正在生成答案...');
+        if (index !== -1) {
+          updated[index] = { sender: 'bot', text: replyText };
+        } else {
+          updated.push({ sender: 'bot', text: replyText });
+        }
+        return updated;
+      });
     } catch (error) {
       setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
     } finally {
@@ -143,18 +145,14 @@ const replyText = typeof data === 'string'
       });
       const data = await response.json();
 
-let replyText = '無回應';
-if (typeof data === 'object') {
-  if (typeof data.reply === 'string') {
-    replyText = data.reply;
-  } else if (typeof data.output === 'string') {
-    replyText = data.output;
-  } else {
-    replyText = flattenObject(data).join('\n');
-  }
-} else if (typeof data === 'string') {
-  replyText = data;
-}
+      let replyText = '無回應';
+      if (typeof data === 'object' && 'reply' in data) {
+        replyText = data.reply;
+      } else if (typeof data === 'string') {
+        replyText = data;
+      } else if (typeof data === 'object') {
+        replyText = flattenObject(data).join('\n');
+      }
 
       setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
       setShowCamera(false);

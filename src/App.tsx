@@ -70,8 +70,12 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+setMessages((prev) => [
+  ...prev,
+  userMessage,
+  { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }
+]);
+setInput('');
   
     // 這一行是新加的提示語
     setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);

@@ -69,13 +69,10 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+  
     const userMessage = { sender: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
     setInput('');
-  
-    // 這一行是新加的提示語
-    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
-  
     setLoading(true);
   
     try {
@@ -88,16 +85,31 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
       const data = await response.json();
       let replyText = '無回應';
   
-      if (typeof data === 'object' && 'reply' in data) {
-        replyText = data.reply;
+      if (typeof data === 'object') {
+        if (typeof data.reply === 'string') {
+          replyText = data.reply;
+        } else if (typeof data.output === 'string') {
+          replyText = data.output;
+        } else {
+          // 若都不是純文字，就展平顯示
+          replyText = flattenObject(data).join('\n');
+        }
       } else if (typeof data === 'string') {
         replyText = data;
-      } else if (typeof data === 'object') {
-        replyText = flattenObject(data).join('\n');
       }
   
-      // 把原本的暫時訊息更新成最終回應（或直接 append）
-      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
+      // 將「正在生成中」那句替換為真正回應
+      setMessages((prev) => {
+        const updated = [...prev];
+        const thinkingIndex = updated.findIndex(m => m.text === '已收到你的查詢，正在生成答案...');
+        if (thinkingIndex !== -1) {
+          updated[thinkingIndex] = { sender: 'bot', text: replyText };
+        } else {
+          updated.push({ sender: 'bot', text: replyText });
+        }
+        return updated;
+      });
+  
     } catch (error) {
       setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
     } finally {

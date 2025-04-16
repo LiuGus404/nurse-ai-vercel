@@ -77,10 +77,6 @@ setMessages((prev) => [
 ]);
 setInput('');
   
-    // 這一行是新加的提示語
-    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
-  
-    setLoading(true);
   
     try {
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {

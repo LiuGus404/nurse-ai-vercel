@@ -70,12 +70,17 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
-setMessages((prev) => [
-  ...prev,
-  userMessage,
-  { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }
-]);
-setInput('');
+    const sendMessage = async () => {
+      if (!input.trim()) return;
+    
+      const userMessage = { sender: 'user', text: input };
+      setMessages((prev) => [
+        ...prev,
+        userMessage,
+        { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }
+      ]);
+      setInput('');
+      setLoading(true); // 加回這行
   
   
     try {
@@ -92,8 +97,16 @@ const replyText = typeof data === 'string'
   ? data.output
   : flattenObject(data).join('\n');
   
-      // 把原本的暫時訊息更新成最終回應（或直接 append）
-      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
+  setMessages((prev) => {
+    const updated = [...prev];
+    const index = updated.findIndex(m => m.text === '已收到你的查詢，正在生成答案...');
+    if (index !== -1) {
+      updated[index] = { sender: 'bot', text: replyText };
+    } else {
+      updated.push({ sender: 'bot', text: replyText });
+    }
+    return updated;
+  });
     } catch (error) {
       setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
     } finally {

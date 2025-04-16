@@ -74,7 +74,7 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
     setInput('');
   
     // 這一行是新加的提示語
-    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...' }]);
+    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...(一般文本回覆時間為15-20s)' }]);
   
     setLoading(true);
   
@@ -121,7 +121,7 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
 
   const confirmPhoto = async () => {
     if (!photoPreview) return;
-    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: photoPreview }]);
+    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...(一般圖片回覆時間為20-30s)', image: photoPreview }]);
     setLoading(true);
 
     const payload = new FormData();

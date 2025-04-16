@@ -86,15 +86,11 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
       });
   
       const data = await response.json();
-      let replyText = '無回應';
-  
-      if (typeof data === 'object' && 'reply' in data) {
-        replyText = data.reply;
-      } else if (typeof data === 'string') {
-        replyText = data;
-      } else if (typeof data === 'object') {
-        replyText = flattenObject(data).join('\n');
-      }
+const replyText = typeof data === 'string'
+  ? data
+  : typeof data.output === 'string'
+  ? data.output
+  : flattenObject(data).join('\n');
   
       // 把原本的暫時訊息更新成最終回應（或直接 append）
       setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);

@@ -307,8 +307,9 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
         >
           按此進行小測驗
         </a>
-      </div>
-    </div>
+        <div className="pt-2 text-center text-xs text-gray-400 italic">
+  © 2025 Created by 4人小隊
+</div>
   );
 }
 

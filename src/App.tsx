@@ -308,9 +308,11 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
           按此進行小測驗
         </a>
       </div>
+
       <div className="pt-4 text-center">
   <a href="https://forms.gle/..." ...>按此進行小測驗</a>
 </div>
+
     </div>
   );
 }

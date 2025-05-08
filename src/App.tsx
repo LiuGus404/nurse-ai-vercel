@@ -229,7 +229,7 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
         </div>
       )}
 
-      <div className="space-y-2 w-full h-[250px] overflow-y-auto p-2 border rounded-xl bg-neutral-100">
+      <div className="space-y-2 w-full h-[150px] overflow-y-auto p-2 border rounded-xl bg-neutral-100">
         {messages.map((msg, index) => (
           <div key={index} className={`p-3 rounded-xl ${msg.sender === 'user' ? 'bg-white' : 'bg-gray-200'}`}>
             {msg.image && <img src={msg.image} alt="上傳圖片" className="mb-2 rounded border" width={240} />}

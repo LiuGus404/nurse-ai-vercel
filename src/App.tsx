@@ -308,6 +308,26 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
           按此進行小測驗
         </a>
       </div>
+      <div className="pt-2 text-center">
+        <a
+          href="https://drive.google.com/file/d/19vh2iX3xDK_HnEmhjiVy1TXkd_wHfYDn/view?usp=drivesdk"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full"
+        >
+          按此觀看活動式膝關節支架影片
+        </a>
+      </div>
+      <div className="pt-2 text-center">
+        <a
+          href="https://drive.google.com/file/d/1EfKolGuzar-b8DF5HOPNCNIvl8eAY_Vb/view?usp=drivesdk"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full"
+        >
+          按此觀看足踝矯形器影片
+        </a>
+      </div>
 
       <div className="text-xs text-gray-500 mt-2">
     Created by 4人小隊

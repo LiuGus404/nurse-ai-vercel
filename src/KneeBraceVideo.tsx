@@ -4,8 +4,9 @@ export default function KneeBraceVideo() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-4 max-w-md mx-auto bg-white rounded-lg shadow-md">
-      <div className="flex justify-end">
+    <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">活動式膝關節支架 (Hinge Knee Brace) 教學影片</h1>
         <button
           onClick={() => navigate(-1)}
           className="text-sm text-gray-500 hover:underline"
@@ -13,8 +14,7 @@ export default function KneeBraceVideo() {
           ⬅ 上一頁
         </button>
       </div>
-      <h1 className="text-lg font-semibold mb-4">活動式膝關節支架 (Hinge Knee Brace) 教學影片</h1>
-      <div className="rounded overflow-hidden mb-4">
+      <div className="bg-white border border-gray-300 px-4 py-3 rounded-lg shadow-sm">
         <iframe
           src="https://drive.google.com/file/d/19vh2iX3xDK_HnEmhjiVy1TXkd_wHfYDn/preview"
           width="100%"

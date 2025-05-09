@@ -9,7 +9,7 @@ function flattenObject(obj: any, prefix = ''): string[] {
     if (typeof value === 'object' && value !== null) {
       lines.push(...flattenObject(value, path));
     } else {
-      lines.push(`${path}: ${value}`);
+      lines.push(`${path} ${value}`);  // 改掉冒號為空格
     }
   }
   return lines;

@@ -231,9 +231,16 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
 
       <div className="space-y-2 w-full h-[150px] overflow-y-auto p-2 border rounded-xl bg-neutral-100">
         {messages.map((msg, index) => (
-          <div key={index} className={`p-3 rounded-xl ${msg.sender === 'user' ? 'bg-white' : 'bg-gray-200'}`}>
-            {msg.image && <img src={msg.image} alt="上傳圖片" className="mb-2 rounded border" width={240} />}
-            <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+          <div key={index} className="flex items-start space-x-2">
+            <img
+              src={msg.sender === 'user' ? '/user.png' : '/nurse.png'}
+              alt={msg.sender === 'user' ? 'User' : 'Nurse'}
+              className="w-8 h-8 rounded-full"
+            />
+            <div className={`p-3 rounded-xl ${msg.sender === 'user' ? 'bg-white' : 'bg-gray-200'}`}>
+              {msg.image && <img src={msg.image} alt="上傳圖片" className="mb-2 rounded border" width={240} />}
+              <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+            </div>
           </div>
         ))}
       </div>

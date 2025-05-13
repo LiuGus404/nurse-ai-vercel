@@ -5,7 +5,7 @@ import App from './App';
 import KneeBraceVideo from './KneeBraceVideo';
 import AfoVideo from './AfoVideo';
 import UsageGuide from './pages/UsageGuide';
-import Layout from './layout';
+import Layout from './Layout';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import NotionNLogo from '../NotionNLogo';
+
 function flattenObject(obj: any, prefix = ''): string[] {
   const lines: string[] = [];
   for (const key in obj) {
@@ -12,6 +14,7 @@ function flattenObject(obj: any, prefix = ''): string[] {
   }
   return lines;
 }
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string; image?: string }[]>([{
     sender: 'bot',
@@ -177,6 +180,10 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800 pb-20">
+      <header className="flex items-center gap-2 mb-2">
+        <NotionNLogo />
+        <span className="font-bold text-xl tracking-wide">Nurse AI</span>
+      </header>
       <div className="bg-white border border-gray-300 text-sm text-gray-700 px-4 py-3 rounded-lg shadow-sm mb-4">
         <p>📱 想更方便使用嗎？你可以將本網站加到主畫面，就像 App 一樣使用！</p>
         <p className="mt-1"><strong>iPhone（Safari）：</strong> 點擊下方「分享」圖示 → 選擇「加入主畫面」</p>
@@ -252,12 +259,6 @@ export default function ChatPage() {
       </div>
       <div className="pt-4 text-center">
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSfxQtMDm7-ItDQYkjKlZ5AM7d19lbah2x8-KULy2a1mk4f5uw/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full">按此進行小測驗</a>
-      </div>
-      <div className="pt-2 text-center">
-        <a href="/knee-brace-video" className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full">按此觀看活動式膝關節支架影片</a>
-      </div>
-      <div className="pt-2 text-center">
-        <a href="/afo-video" className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full">按此觀看足踝矯形器影片</a>
       </div>
       <div className="text-xs text-gray-500 mt-2">Created by 4人小隊</div>
     </div>

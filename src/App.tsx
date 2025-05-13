@@ -310,7 +310,9 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
 
       <div className="pt-4 text-center">
         <a
-          href="/pages/form"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSfxQtMDm7-ItDQYkjKlZ5AM7d19lbah2x8-KULy2a1mk4f5uw/viewform?usp=dialog"
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full"
         >
           按此進行小測驗

@@ -5,6 +5,7 @@ import App from './App';
 import KneeBraceVideo from './KneeBraceVideo';
 import AfoVideo from './AfoVideo';
 import UsageGuide from './pages/UsageGuide';
+import ChatPage from './pages/ChatPage';
 import Layout from './Layout';
 import './index.css';
 
@@ -13,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<ChatPage />} />
           <Route path="/videos" element={<KneeBraceVideo />} />
           <Route path="/afo-video" element={<AfoVideo />} />
           <Route path="/guide" element={<UsageGuide />} />

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
 import KneeBraceVideo from './KneeBraceVideo';
 import AfoVideo from './AfoVideo';
+import GuidePage from './pages/guide'; // 新增引入
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -11,8 +12,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/knee-brace-video" element={<KneeBraceVideo />} />
+        <Route path="/videos" element={<KneeBraceVideo />} />
         <Route path="/afo-video" element={<AfoVideo />} />
+        <Route path="/guide" element={<GuidePage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

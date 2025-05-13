@@ -1,0 +1,42 @@
+export default function GuidePage() {
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4">使用方法</h1>
+
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">📱 如何將網站加到手機桌面</h2>
+        <p className="text-gray-700 text-sm leading-relaxed">
+          iPhone 用戶可點選 Safari 下方的「分享」按鈕，選擇「加入主畫面」；
+          Android 用戶可在 Chrome 中點選右上角選單，選擇「加到主畫面」，
+          即可將本網站以 Web App 形式儲存在手機桌面，方便隨時打開使用。
+        </p>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">📷 拍照識別裝置</h2>
+        <p className="text-gray-700 text-sm leading-relaxed">
+          進入對話頁面（Chat），點選拍照圖示後即可上傳圖片，
+          AI 將自動判斷圖片中佩戴的是足踝矯形器（AFO）或活動式膝關節支架（Hinge Knee Brace），
+          以提供更準確的輔助資訊。
+        </p>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">💬 使用 AI Chatbot 查詢</h2>
+        <p className="text-gray-700 text-sm leading-relaxed">
+          可在對話框輸入問題，AI 會根據內部資料庫提供回覆，通常在 15–25 秒內回應。
+          如遇無回應或錯誤，請稍等並重新提問。
+          為保障用戶私隱，所有對話將不會儲存或記錄。
+        </p>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">⚠️ 注意事項</h2>
+        <p className="text-gray-700 text-sm leading-relaxed">
+          如在佩戴過程中出現任何異常或不適，例如劇痛、紅腫、水泡等情況，
+          請立即停止使用並盡快諮詢專業醫療人員的意見。
+        </p>
+      </section>
+    </div>
+  );
+}

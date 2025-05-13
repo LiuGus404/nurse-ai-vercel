@@ -11,15 +11,15 @@ export default function Layout({ children }: LayoutProps) {
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around py-2 z-50">
         <a href="/" className="flex flex-col items-center text-xs text-gray-700">
-          <span>💬</span>
+          <img src="/home.png" alt="主頁" className="w-7 h-7 mb-1" />
           <span>主頁</span>
         </a>
         <a href="/videos" className="flex flex-col items-center text-xs text-gray-700">
-          <span>🎬</span>
+          <img src="/video.png" alt="教學影片" className="w-7 h-7 mb-1" />
           <span>教學影片</span>
         </a>
         <a href="/guide" className="flex flex-col items-center text-xs text-gray-700">
-          <span>📘</span>
+          <img src="/how.png" alt="使用方法" className="w-7 h-7 mb-1" />
           <span>使用方法</span>
         </a>
         <a
@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
           rel="noopener noreferrer"
           className="flex flex-col items-center text-xs text-gray-700"
         >
-          <span>📝</span>
+          <img src="/quiz.png" alt="小測驗" className="w-7 h-7 mb-1" />
           <span>小測驗</span>
         </a>
       </div>

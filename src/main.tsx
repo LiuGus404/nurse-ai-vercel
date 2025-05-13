@@ -17,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<ChatPage />} />
           <Route path="/videos" element={<TutorialVideos />} />
+          <Route path="/knee-brace-video" element={<KneeBraceVideo />} />
           <Route path="/afo-video" element={<AfoVideo />} />
           <Route path="/guide" element={<UsageGuide />} />
         </Routes>

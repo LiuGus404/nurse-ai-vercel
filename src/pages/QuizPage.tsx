@@ -2,7 +2,8 @@ import React from 'react';
 export default function QuizPage() {
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800 pb-20">
-      <h2 className="text-xl font-bold mb-4">小測驗</h2>
+      <h2 className="text-xl font-bold mb-2">小測驗</h2>
+      <img src="/quiz.png" alt="小測驗" className="w-16 h-16 mx-auto mb-2" />
       <div className="bg-white border border-gray-200 rounded-xl shadow p-4">
         <div className="mb-2">你可以進行自我評量，檢視學習成效：</div>
         <a

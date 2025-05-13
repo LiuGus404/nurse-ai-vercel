@@ -180,16 +180,26 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800 pb-20">
-      <header className="flex items-center gap-2 mb-2">
-        <NotionNLogo />
-        <span className="font-bold text-xl tracking-wide">Nurse AI</span>
+      <header className="flex items-center gap-2 mb-2 justify-between">
+        <div className="flex items-center gap-2">
+          <NotionNLogo />
+          <span className="font-bold text-xl tracking-wide">Nurse AI</span>
+        </div>
+        <img src="/user.png" alt="個人頭像" className="w-9 h-9 rounded-full border border-gray-300 bg-white" />
       </header>
       <div className="bg-white border border-gray-300 text-sm text-gray-700 px-4 py-3 rounded-lg shadow-sm mb-4">
         <p>📱 想更方便使用嗎？你可以將本網站加到主畫面，就像 App 一樣使用！</p>
         <p className="mt-1"><strong>iPhone（Safari）：</strong> 點擊下方「分享」圖示 → 選擇「加入主畫面」</p>
         <p className="mt-1"><strong>Android（Chrome）：</strong> 點右上「⋮」 → 選擇「加到主畫面」</p>
       </div>
-      <div className="flex justify-end gap-2">
+      <div className="flex gap-2 items-center mb-2">
+        <button
+          className="border border-black text-black bg-white px-3 py-1 rounded text-xs hover:bg-gray-100 shadow-sm flex items-center gap-2"
+          onClick={() => setShowCamera(true)}
+        >
+          <img src="/camera.png" alt="camera icon" className="w-4 h-4" />
+          按此拍照識別護具
+        </button>
         <button onClick={() => setShowHelp('wear')} className="text-sm text-gray-700 hover:underline">如何戴？</button>
         <button onClick={() => setShowHelp('care')} className="text-sm text-gray-700 hover:underline">如何護理？</button>
       </div>
@@ -256,9 +266,6 @@ export default function ChatPage() {
             )}
           </div>
         )}
-      </div>
-      <div className="pt-4 text-center">
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfxQtMDm7-ItDQYkjKlZ5AM7d19lbah2x8-KULy2a1mk4f5uw/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" className="inline-block border border-black text-black bg-white px-4 py-2 rounded text-sm hover:bg-gray-100 text-center w-full">按此進行小測驗</a>
       </div>
       <div className="text-xs text-gray-500 mt-2">Created by 4人小隊</div>
     </div>

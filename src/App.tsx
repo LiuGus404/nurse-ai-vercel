@@ -229,7 +229,10 @@ const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
         </div>
       )}
 
-      <div className="space-y-2 w-full h-[150px] overflow-y-auto p-2 border rounded-xl bg-neutral-100">
+      <div
+        className="space-y-2 w-full max-h-[400px] overflow-y-auto p-2 border rounded-xl bg-neutral-100"
+        style={{ height: Math.min(150 + messages.length * 30, 400) }}
+      >
         {messages.map((msg, index) => (
           <div key={index} className="flex items-start space-x-2">
             <img

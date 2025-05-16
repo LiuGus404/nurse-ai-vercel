@@ -1,6 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import NotionNLogo from '../NotionNLogo';
 
+// 初始化 session_id（存在 localStorage）
+const getSessionId = () => {
+  let sessionId = localStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem('session_id', sessionId);
+  }
+  return sessionId;
+};
+
 function flattenObject(obj: any, prefix = ''): string[] {
   const lines: string[] = [];
   for (const key in obj) {
@@ -16,6 +26,7 @@ function flattenObject(obj: any, prefix = ''): string[] {
 }
 
 export default function ChatPage() {
+  const sessionId = getSessionId();
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string; image?: string }[]>([{
     sender: 'bot',
     text: '你好！有甚麼有關 AFO（足踝矯形器）或 Hinge Knee Brace（活動式膝關節支架） 的問題都可以向我查詢！',
@@ -78,7 +89,7 @@ export default function ChatPage() {
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input, session_id: sessionId }),
       });
       const data = await response.json();
       let replyText = '無回應';
@@ -116,6 +127,7 @@ export default function ChatPage() {
     setLoading(true);
     const payload = new FormData();
     payload.append('image', photoPreview);
+    payload.append('session_id', sessionId);
     try {
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
         method: 'POST',
@@ -154,6 +166,7 @@ export default function ChatPage() {
       setLoading(true);
       const payload = new FormData();
       payload.append('image', base64);
+      payload.append('session_id', sessionId);
       try {
         const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
           method: 'POST',

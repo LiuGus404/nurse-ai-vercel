@@ -86,6 +86,7 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...(一般文本回覆時間為15-20s)' }]);
     setLoading(true);
     try {
+      console.log('送出內容：', JSON.stringify({ message: input, session_id: sessionId }));
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

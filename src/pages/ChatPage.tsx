@@ -40,6 +40,7 @@ export default function ChatPage() {
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     let stream: MediaStream;
@@ -83,7 +84,8 @@ export default function ChatPage() {
     const userMessage = { sender: 'user', text: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
-    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...(一般文本回覆時間為15-20s)' }]);
+    const botReplyIndex = messages.length + 1;
+    setMessages((prev) => [...prev, { sender: 'bot', text: '已收到你的查詢，正在生成答案...(一般文本回覆時間為5-10s)' }]);
     setLoading(true);
     try {
       console.log('送出內容：', JSON.stringify({ message: input, session_id: sessionId }));
@@ -101,7 +103,11 @@ export default function ChatPage() {
       } else if (typeof data === 'object') {
         replyText = flattenObject(data).join('\n');
       }
-      setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[botReplyIndex] = { sender: 'bot', text: replyText };
+        return updated;
+      });
     } catch (error) {
       setMessages((prev) => [...prev, { sender: 'bot', text: '發生錯誤，請稍後再試。' }]);
     } finally {
@@ -124,7 +130,7 @@ export default function ChatPage() {
 
   const confirmPhoto = async () => {
     if (!photoPreview) return;
-    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...(一般圖片回覆時間為20-30s)', image: photoPreview }]);
+    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...(一般圖片回覆時間為15-20s)', image: photoPreview }]);
     setLoading(true);
     const payload = new FormData();
     payload.append('image', photoPreview);
@@ -163,7 +169,7 @@ export default function ChatPage() {
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64 = reader.result as string;
-      setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...', image: base64 }]);
+      setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...(一般圖片回覆時間為15-20s)', image: base64 }]);
       setLoading(true);
       const payload = new FormData();
       payload.append('image', base64);
@@ -190,6 +196,44 @@ export default function ChatPage() {
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const speakText = (text: string) => {
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+      alert('你的瀏覽器不支援語音播放功能');
+      return;
+    }
+    const trySpeak = () => {
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        return;
+      }
+
+      const utterance = new window.SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-HK';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const zhHKVoice = voices.find(v => v.lang === 'zh-HK');
+      if (zhHKVoice) {
+        utterance.voice = zhHKVoice;
+      }
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = trySpeak;
+    } else {
+      trySpeak();
+    }
   };
 
   return (
@@ -237,6 +281,17 @@ export default function ChatPage() {
             <div className={`p-3 rounded-xl ${msg.sender === 'user' ? 'bg-white' : 'bg-gray-200'}`}>
               {msg.image && <img src={msg.image} alt="上傳圖片" className="mb-2 rounded border" width={240} />}
               <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              {msg.sender === 'bot' && (
+                <button
+                  onClick={() => speakText(msg.text)}
+                  className={`mt-2 text-xs flex items-center gap-1 ${
+                    isSpeaking ? 'text-red-600 hover:text-red-700' : 'text-gray-600 hover:text-black'
+                  }`}
+                >
+                  <img src="/audio.png" alt="播放語音" className="w-4 h-4" />
+                  <span>播放</span>
+                </button>
+              )}
             </div>
           </div>
         ))}

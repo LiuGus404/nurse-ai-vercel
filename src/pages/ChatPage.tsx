@@ -178,8 +178,7 @@ export default function ChatPage() {
     reader.onloadend = async () => {
       const base64 = reader.result as string;
       setPhotoPreview(base64);
-      setShowCamera(true);
-      setShowPhotoModal(true);
+      setShowPhotoModal(true); // 不再呼叫 setShowCamera(true)
     };
     reader.readAsDataURL(file);
   };

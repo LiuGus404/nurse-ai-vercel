@@ -18,6 +18,10 @@ export default function Layout({ children }: LayoutProps) {
           <img src="/video.png" alt="教學影片" className="w-8 h-8 mb-1" />
           <span>教學影片</span>
         </a>
+        <a href="/AccessibleTextCommunicator" className="flex flex-col items-center text-sm text-gray-700">
+          <img src="/card.png" alt="顯字卡" className="w-8 h-8 mb-1" />
+          <span>顯字卡</span>
+        </a>
         <a href="/guide" className="flex flex-col items-center text-sm text-gray-700">
           <img src="/how.png" alt="使用方法" className="w-8 h-8 mb-1" />
           <span>使用方法</span>

@@ -8,6 +8,7 @@ import UsageGuide from './pages/UsageGuide';
 import ChatPage from './pages/ChatPage';
 import Layout from './Layout';
 import TutorialVideos from './pages/TutorialVideos';
+import AccessibleTextCommunicator from './pages/AccessibleTextCommunicator';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -20,6 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/knee-brace-video" element={<KneeBraceVideo />} />
           <Route path="/afo-video" element={<AfoVideo />} />
           <Route path="/guide" element={<UsageGuide />} />
+          <Route path="/AccessibleTextCommunicator" element={<AccessibleTextCommunicator />} />
         </Routes>
       </Layout>
     </BrowserRouter>

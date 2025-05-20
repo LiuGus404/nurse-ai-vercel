@@ -36,13 +36,11 @@ export default function ChatPage() {
   const [showCamera, setShowCamera] = useState(false);
   const [cameraError, setCameraError] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [photoTextInput, setPhotoTextInput] = useState('');
   const [showHelp, setShowHelp] = useState<'wear' | 'care' | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   useEffect(() => {
     let stream: MediaStream;
@@ -82,7 +80,6 @@ export default function ChatPage() {
   };
 
   const sendMessage = async () => {
-    if (input.trim().length > 100) return;
     if (!input.trim()) return;
     const userMessage = { sender: 'user', text: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -129,15 +126,11 @@ export default function ChatPage() {
     context.drawImage(videoRef.current, 0, 0, 320, 240);
     const imageData = canvasRef.current.toDataURL('image/png');
     setPhotoPreview(imageData);
-    setShowPhotoModal(true);
   };
 
   const confirmPhoto = async () => {
     if (!photoPreview) return;
-    const userPhotoMessage = photoTextInput.trim()
-      ? `已上傳相片：${photoTextInput.trim()} (一般圖片回覆時間為15-20s)`
-      : '已上傳相片，等待回應...(一般圖片回覆時間為15-20s)';
-    setMessages((prev) => [...prev, { sender: 'user', text: userPhotoMessage, image: photoPreview }]);
+    setMessages((prev) => [...prev, { sender: 'user', text: '已上傳相片，等待回應...(一般圖片回覆時間為15-20s)', image: photoPreview }]);
     setLoading(true);
     const payload = new FormData();
     payload.append('image', photoPreview);
@@ -160,9 +153,8 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, { sender: 'bot', text: replyText }]);
       setShowCamera(false);
       setPhotoPreview(null);
-      setPhotoTextInput('');
     } catch {
-      setMessages((prev) => [...prev, { sender: 'bot', text: '圖片上傳時發生錯誤' }]);
+      setMessages((prev) => [...prev, { sender: 'bot', text: '拍照送出時發生錯誤' }]);
     } finally {
       setLoading(false);
     }
@@ -179,6 +171,7 @@ export default function ChatPage() {
     reader.onloadend = async () => {
       const base64 = reader.result as string;
       setPhotoPreview(base64);
+      setShowCamera(true);
       setShowPhotoModal(true);
     };
     reader.readAsDataURL(file);
@@ -283,21 +276,13 @@ export default function ChatPage() {
         ))}
       </div>
       <div className="flex gap-2 items-center">
-        <input
-          className="flex-1 border rounded px-2 py-1 text-sm bg-white"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="輸入訊息..."
-          maxLength={100}
-        />
+        <input className="flex-1 border rounded px-2 py-1 text-sm bg-white" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyPress} placeholder="輸入訊息..." />
         <button className="border border-black text-black bg-white px-4 py-1 rounded text-sm hover:bg-gray-100" onClick={sendMessage} disabled={loading}>{loading ? '傳送中…' : '發送'}</button>
         <label className="border border-gray-400 bg-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-gray-100">
           上傳相片
           <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
         </label>
       </div>
-      <p className="text-xs text-gray-500 mt-1 text-right">尚餘 {100 - input.length} 字</p>
       <div className="space-y-2">
         {!showCamera && (
           <button className="border border-black text-black bg-white rounded px-4 py-1 text-sm hover:bg-gray-100" onClick={() => setShowCamera(true)}>
@@ -318,27 +303,18 @@ export default function ChatPage() {
                 <button className="border border-black bg-white text-black rounded px-4 py-1 text-sm hover:bg-gray-100" onClick={takePhoto} disabled={loading}>拍照</button>
               </>
             )}
+            {photoPreview && (
+              <div className="space-y-2">
+                <img src={photoPreview} alt="preview" className="border rounded" width={320} height={240} />
+                <div className="flex gap-2">
+                  <button className="border border-black text-black bg-white px-4 py-1 rounded text-sm hover:bg-gray-100" onClick={confirmPhoto} disabled={loading}>確認送出</button>
+                  <button className="border border-gray-500 text-gray-700 bg-white px-4 py-1 rounded text-sm hover:bg-gray-100" onClick={cancelPhoto} disabled={loading}>重拍</button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
-      {showPhotoModal && photoPreview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 space-y-3 w-11/12 max-w-sm max-h-[95vh] overflow-y-auto">
-            <img src={photoPreview} alt="preview" className="rounded border max-h-40 w-auto mx-auto" />
-            <input
-              className="border px-2 py-1 rounded text-sm w-full"
-              type="text"
-              placeholder="可補充文字說明..."
-              value={photoTextInput}
-              onChange={(e) => setPhotoTextInput(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button onClick={() => { setShowPhotoModal(false); setPhotoPreview(null); }} className="text-sm px-3 py-1 border rounded hover:bg-gray-100">取消</button>
-              <button onClick={() => { setShowPhotoModal(false); confirmPhoto(); }} className="text-sm px-3 py-1 border bg-black text-white rounded hover:opacity-80">送出</button>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="text-xs text-gray-500 mt-2">Created by 4人小隊</div>
     </div>
   );

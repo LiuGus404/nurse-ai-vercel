@@ -142,7 +142,6 @@ export default function ChatPage() {
     const payload = new FormData();
     payload.append('image', photoPreview);
     payload.append('session_id', sessionId);
-    payload.append('description', photoTextInput.trim());
     try {
       const response = await fetch('https://liugus.app.n8n.cloud/webhook/c56c0eb1-fc53-4264-b29c-6ca0b4e51aa6', {
         method: 'POST',
@@ -179,6 +178,7 @@ export default function ChatPage() {
     reader.onloadend = async () => {
       const base64 = reader.result as string;
       setPhotoPreview(base64);
+      setShowCamera(true);
       setShowPhotoModal(true);
     };
     reader.readAsDataURL(file);

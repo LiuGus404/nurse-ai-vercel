@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import NotionNLogo from '../NotionNLogo';
+import DisclaimerModal from '../components/DisclaimerModal';
 
 // 初始化 session_id（存在 localStorage）
 const getSessionId = () => {
@@ -27,6 +28,7 @@ function flattenObject(obj: any, prefix = ''): string[] {
 
 export default function ChatPage() {
   const sessionId = getSessionId();
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [messages, setMessages] = useState<{ sender: 'user' | 'bot'; text: string; image?: string }[]>([{
     sender: 'bot',
     text: '你好！有甚麼有關 AFO（足踝矯形器）或 Hinge Knee Brace（活動式膝關節支架） 的問題都可以向我查詢！',
@@ -43,6 +45,15 @@ export default function ChatPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     let stream: MediaStream;
@@ -221,8 +232,21 @@ export default function ChatPage() {
     }
   };
 
+  const handleAcceptDisclaimer = () => {
+    setShowDisclaimer(false);
+  };
+
+  const handleCloseDisclaimer = () => {
+    setShowDisclaimer(false);
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 font-sans text-gray-800 pb-20">
+      <DisclaimerModal
+        isOpen={showDisclaimer}
+        onClose={handleCloseDisclaimer}
+        onAccept={handleAcceptDisclaimer}
+      />
       <header className="flex items-center gap-2 mb-2 justify-between">
         <div className="flex items-center gap-2">
           <NotionNLogo />
@@ -280,6 +304,7 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <div className="flex gap-2 items-center">
         <input
@@ -338,7 +363,7 @@ export default function ChatPage() {
           </div>
         </div>
       )}
-      <div className="text-xs text-gray-500 mt-2">Created by 4人小隊</div>
+      <div className="text-xs text-gray-500 mt-2">Created by PRACC 4人小隊</div>
     </div>
   );
 } 

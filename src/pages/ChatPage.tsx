@@ -305,6 +305,9 @@ export default function ChatPage() {
           </div>
         ))}
         <div ref={messagesEndRef} />
+        <div className="text-xs text-gray-500 italic mt-4 text-center">
+          以上內容由 AI 根據資料整理產生，僅供參考。如有疑問或不適，請即時聯絡你的醫護人員。
+        </div>
       </div>
       <div className="flex gap-2 items-center">
         <input

@@ -7,10 +7,14 @@ console.log("AccessibleTextCommunicator component loaded");
 import { useState, useEffect } from 'react'
 
 const commonPhrases = [
-  '你好，我是照顧你的人。',
+  '你好，我是照顧你的護士。',
   '現在會幫你換衣服，好嗎？',
-  '請問你會痛嗎？',
-  '想要喝水嗎？',
+  '請問你要喝水嗎？',
+  '你最後一次食野飲水是幾時？',
+  '由現在開始不准食野飲水？',
+  '不要動',
+  '不要自己下床？',
+  '你有食開私家藥？',
   '可以點頭或搖頭。'
 ]
 
@@ -127,11 +131,15 @@ export default function AccessibleTextCommunicator() {
         </div>
 
         <div className="bg-white border border-[#DADADA] rounded-2xl p-6 min-h-[80px] flex items-center justify-center text-2xl font-semibold text-[#333] shadow-md cursor-pointer select-none" onClick={() => { if (chars.length > 0) openModalAtIndex(0) }}>
-          {chars.length > 0 ? chars.map((char, idx) => (
-            <span key={idx} className="inline-block px-1" onClick={(e) => { e.stopPropagation(); openModalAtIndex(idx) }}>
-              {char}
-            </span>
-          )) : '溝通卡載入中...'}
+          {chars.length > 0 ? (
+            <div className="w-full break-words whitespace-pre-wrap text-center">
+              {chars.map((char, idx) => (
+                <span key={idx} className="inline-block px-1" onClick={(e) => { e.stopPropagation(); openModalAtIndex(idx) }}>
+                  {char}
+                </span>
+              ))}
+            </div>
+          ) : '溝通卡載入中...'}
         </div>
 
         <div className="mt-4 flex justify-end">

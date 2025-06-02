@@ -16,7 +16,7 @@ export default function AfoVideo() {
       </div>
       <div className="bg-white border border-gray-300 px-4 py-3 rounded-lg shadow-sm">
         <iframe
-          src="https://drive.google.com/file/d/1EfKolGuzar-b8DF5HOPNCNIvl8eAY_Vb/preview"
+          src="https://drive.google.com/file/d/1XdFiIJjb9lnHeRnzHzQpPGAogqGx1KjB/preview"
           width="100%"
           height="240"
           allow="autoplay"

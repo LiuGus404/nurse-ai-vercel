@@ -16,7 +16,7 @@ export default function KneeBraceVideo() {
       </div>
       <div className="bg-white border border-gray-300 px-4 py-3 rounded-lg shadow-sm">
         <iframe
-          src="https://drive.google.com/file/d/19vh2iX3xDK_HnEmhjiVy1TXkd_wHfYDn/preview"
+          src="https://drive.google.com/file/d/1eHamPQKdwoQ-UN99DpXhgYsolsHRcxRq/preview"
           width="100%"
           height="240"
           allow="autoplay"
